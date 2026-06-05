@@ -209,7 +209,7 @@ export default function PublicPage({ page }) {
             <div style={{
               position: 'relative', zIndex: 1,
               padding: 16,
-              display: 'flex', flexDirection: 'column', gap: 10,
+              display: 'flex', flexDirection: 'column', gap: 14,
             }}>
             {page.items.map((item, i) => (
               <a key={i} href={item.url || '#'} target="_blank" rel="noopener noreferrer"
@@ -225,7 +225,7 @@ export default function PublicPage({ page }) {
                   backdropFilter: 'blur(8px)',
                   WebkitBackdropFilter: 'blur(8px)',
                   border: '1px solid rgba(255,255,255,0.4)',
-                  fontSize: 14, fontWeight: 500,
+                  fontSize: 15, fontWeight: 700,
                   color: '#2d1a0e',
                   textDecoration: 'none',
                   boxShadow: hoveredIdx === i

@@ -194,7 +194,7 @@ export function PagePreview({ form }) {
         {/* 버튼 영역 */}
         <div style={{ position: 'relative' }}>
           <div style={{ position: 'absolute', inset: 0, background: `rgba(180,70,10,${Math.max(0, overlayOpacity - 0.15)})`, pointerEvents: 'none' }} />
-          <div style={{ position: 'relative', zIndex: 1, padding: '8px 8px 10px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ position: 'relative', zIndex: 1, padding: '8px 8px 10px', display: 'flex', flexDirection: 'column', gap: 8 }}>
             {form.items.map((item, i) => (
               <div key={i} style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -204,7 +204,7 @@ export function PagePreview({ form }) {
                 backdropFilter: 'blur(6px)',
               }}>
                 <IconBadge icon={item.icon || 'link'} color={color} size="sm" useThemeColor />
-                <span style={{ fontSize: 10, fontWeight: 500, color: '#2d1a0e', flex: 1, textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label || '버튼'}</span>
+                <span style={{ fontSize: 10, fontWeight: 700, color: '#2d1a0e', flex: 1, textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label || '버튼'}</span>
                 <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 5l7 7-7 7"/></svg>
               </div>
             ))}
