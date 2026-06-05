@@ -134,6 +134,12 @@ export function PagePreview({ form }) {
 
   const overlayOpacity = cfg.bg_overlay ?? 0.55;
   const cardOpacity = cfg.card_opacity ?? 0.82;
+  const subtitleColor = cfg.subtitle_color || 'rgba(255,255,255,0.85)';
+  const overlayColor = (() => {
+    const hex = (cfg.title_bg_color || '#b4460a').replace('#', '');
+    const r = parseInt(hex.slice(0,2),16), g = parseInt(hex.slice(2,4),16), b = parseInt(hex.slice(4,6),16);
+    return `rgba(${r},${g},${b},${overlayOpacity})`;
+  })();
 
   return (
     // 페이지 배경 (단색 그라디언트)
@@ -152,7 +158,7 @@ export function PagePreview({ form }) {
         {/* 카드 헤더 */}
         <div style={{ position: 'relative', padding: '20px 14px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
           {/* 헤더 오버레이 */}
-          <div style={{ position: 'absolute', inset: 0, background: `rgba(180,70,10,${overlayOpacity})`, zIndex: 0 }} />
+          <div style={{ position: 'absolute', inset: 0, background: overlayColor, zIndex: 0 }} />
           {/* 헤더 콘텐츠 */}
           <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, width: '100%' }}>
             <div style={{
@@ -173,7 +179,7 @@ export function PagePreview({ form }) {
               </p>
             )}
             {form.subtitle && (
-              <p style={{ margin: 0, fontSize: 9, color: 'rgba(255,255,255,0.85)', textAlign: 'center' }}>
+              <p style={{ margin: 0, fontSize: 9, color: subtitleColor, textAlign: 'center' }}>
                 {form.subtitle}
               </p>
             )}
@@ -328,17 +334,10 @@ export default function PageEditor({ initial, onSave, onCancel, saving }) {
         {/* 색상 */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 14 }}>
           <div>
-            <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#6b7280', marginBottom: 4 }}>제목 바 배경색</label>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#6b7280', marginBottom: 4 }}>헤더 오버레이 색상</label>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <input type="color" value={form.config.title_bg_color || color} onChange={e => cfg({ title_bg_color: e.target.value })} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #d1d5db', cursor: 'pointer' }} />
-              <input type="range" min="0" max="1" step="0.05"
-                value={form.config.title_bg_opacity ?? 1}
-                onChange={e => cfg({ title_bg_opacity: parseFloat(e.target.value) })}
-                style={{ flex: 1 }} />
-              <span style={{ fontSize: 10, color: '#9ca3af', width: 28 }}>
-                {Math.round((form.config.title_bg_opacity ?? 1) * 100)}%
-              </span>
-              {form.config.title_bg_color && <button onClick={() => cfg({ title_bg_color: '', title_bg_opacity: 1 })} style={{ fontSize: 11, color: '#9ca3af', background: 'none', border: 'none', cursor: 'pointer' }}>초기화</button>}
+              <input type="color" value={form.config.title_bg_color || '#b4460a'} onChange={e => cfg({ title_bg_color: e.target.value })} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #d1d5db', cursor: 'pointer' }} />
+              {form.config.title_bg_color && <button onClick={() => cfg({ title_bg_color: '' })} style={{ fontSize: 11, color: '#9ca3af', background: 'none', border: 'none', cursor: 'pointer' }}>초기화</button>}
             </div>
           </div>
           <div>
@@ -351,7 +350,7 @@ export default function PageEditor({ initial, onSave, onCancel, saving }) {
           <div>
             <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#6b7280', marginBottom: 4 }}>부제목 색상</label>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <input type="color" value={form.config.subtitle_color || color} onChange={e => cfg({ subtitle_color: e.target.value })} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #d1d5db', cursor: 'pointer' }} />
+              <input type="color" value={form.config.subtitle_color || '#ffffff'} onChange={e => cfg({ subtitle_color: e.target.value })} style={{ width: 32, height: 32, borderRadius: 6, border: '1px solid #d1d5db', cursor: 'pointer' }} />
               {form.config.subtitle_color && <button onClick={() => cfg({ subtitle_color: '' })} style={{ fontSize: 11, color: '#9ca3af', background: 'none', border: 'none', cursor: 'pointer' }}>초기화</button>}
             </div>
           </div>

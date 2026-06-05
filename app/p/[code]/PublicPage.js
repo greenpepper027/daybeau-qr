@@ -62,14 +62,21 @@ export default function PublicPage({ page }) {
   const [hoveredIdx, setHoveredIdx] = useState(null);
 
   const titleTextColor = cfg.title_color || '#ffffff';
+  const subtitleColor = cfg.subtitle_color || 'rgba(255,255,255,0.9)';
 
-  // ── 배경 이미지는 카드 헤더에만 사용 ──────────────────────────────────────
+  // ── 배경 이미지는 카드 전체 배경에 사용 ───────────────────────────────────
   const headerBgImage = cfg.bg_image_url;
   const headerBgSize  = cfg.bg_size || 'cover';
   const headerBgPos   = cfg.bg_pos  || 'center top';
-  // 오버레이: 에디터의 bg_overlay 값 활용, 없으면 0.55 기본값
   const overlayOpacity = cfg.bg_overlay ?? 0.55;
   const cardOpacity = cfg.card_opacity ?? 0.82;
+
+  // 헤더 오버레이 색상 (title_bg_color), 기본값 #b4460a
+  const overlayColor = (() => {
+    const hex = (cfg.title_bg_color || '#b4460a').replace('#', '');
+    const r = parseInt(hex.slice(0,2),16), g = parseInt(hex.slice(2,4),16), b = parseInt(hex.slice(4,6),16);
+    return `rgba(${r},${g},${b},${overlayOpacity})`;
+  })();
 
   // ── 헤더 색상 (이미지 없을 때 fallback) ──────────────────────────────────
   const headerBg = headerBgImage
@@ -130,7 +137,7 @@ export default function PublicPage({ page }) {
             {/* 헤더 오버레이 */}
             <div style={{
               position: 'absolute', inset: 0,
-              background: `rgba(180,70,10,${overlayOpacity})`,
+              background: overlayColor,
               zIndex: 0,
             }} />
 
@@ -169,7 +176,7 @@ export default function PublicPage({ page }) {
               {page.subtitle && (
                 <p style={{
                   margin: 0, fontSize: 13,
-                  color: 'rgba(255,255,255,0.9)',
+                  color: subtitleColor,
                   textAlign: 'center',
                 }}>
                   {page.subtitle}
