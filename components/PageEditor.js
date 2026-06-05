@@ -120,51 +120,91 @@ function Rings({ color }) {
 export function PagePreview({ form }) {
   const color = form.theme_color || '#f43f5e';
   const cfg = form.config || {};
-  const logoH = { sm: 28, md: 44, lg: 68 }[cfg.logo_size || 'md'];
+  const logoSize = { sm: 40, md: 52, lg: 64 }[cfg.logo_size || 'md'];
   const lang = cfg.lang || {};
   const langLines = [lang.en, lang.zh_hans, lang.zh_hant, lang.ja, lang.th].filter(Boolean);
-  const outerBg = cfg.bg_image_url
-    ? { backgroundImage: `url(${cfg.bg_image_url})`, backgroundSize: cfg.bg_size || 'cover', backgroundPosition: cfg.bg_pos || 'center', backgroundRepeat: 'no-repeat' }
-    : { background: cfg.bg_color || color };
+  const titleTextColor = cfg.title_color || '#ffffff';
 
-  const overlayOpacity = cfg.bg_image_url ? (cfg.bg_overlay ?? 0.3) : 0;
-  const cardOpacity = cfg.card_opacity ?? 0.86;
+  // 배경 이미지 → 카드 전체에 적용
+  const cardBgStyle = cfg.bg_image_url
+    ? { backgroundImage: `url(${cfg.bg_image_url})`, backgroundSize: cfg.bg_size || 'cover', backgroundPosition: cfg.bg_pos || 'center', backgroundRepeat: 'no-repeat' }
+    : cfg.bg_color
+      ? { background: cfg.bg_color }
+      : { background: `linear-gradient(135deg, ${color} 0%, ${color}bb 100%)` };
+
+  const overlayOpacity = cfg.bg_overlay ?? 0.55;
 
   return (
-    <div style={{ ...outerBg, borderRadius: 16, padding: 12, width: 272, flexShrink: 0, position: 'relative' }}>
-      {overlayOpacity > 0 && (
-        <div style={{ position: 'absolute', inset: 0, borderRadius: 16, background: `rgba(0,0,0,${overlayOpacity})`, pointerEvents: 'none', zIndex: 0 }} />
-      )}
-      <div style={{ borderRadius: 20, overflow: 'hidden', boxShadow: '0 4px 20px rgba(0,0,0,0.18)', position: 'relative', zIndex: 1, background: `rgba(255,255,255,${cardOpacity})` }}>
-        <div style={{ background: 'transparent', padding: '14px 14px 10px', textAlign: 'center' }}>
-          {cfg.logo_url
-            ? <img src={cfg.logo_url} alt="logo" style={{ height: logoH, objectFit: 'contain', display: 'block', margin: '0 auto' }} />
-            : <p style={{ margin: 0, fontWeight: 800, fontSize: 13, letterSpacing: '0.1em', color }}>DAYBEAU</p>
-          }
-          {form.subtitle && <p style={{ margin: '3px 0 0', fontSize: 10, color }}>{form.subtitle}</p>}
-        </div>
-        {form.title && (
-          <div style={{ background: hexToRgba(cfg.title_bg_color || color, cfg.title_bg_opacity ?? 1), padding: '7px 14px', textAlign: 'center' }}>
-            <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: '#fff' }}>{form.title}</p>
+    // 페이지 배경 (단색 그라디언트)
+    <div style={{
+      background: 'linear-gradient(160deg, #d4845a 0%, #8b4513 100%)',
+      borderRadius: 16, padding: '20px 12px', width: 272, flexShrink: 0,
+    }}>
+      {/* 플로팅 카드 */}
+      <div style={{
+        borderRadius: 14, overflow: 'hidden',
+        boxShadow: '0 6px 24px rgba(0,0,0,0.3)',
+        ...cardBgStyle,
+        position: 'relative',
+      }}>
+
+        {/* 카드 헤더 */}
+        <div style={{ position: 'relative', padding: '20px 14px 16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+          {/* 헤더 오버레이 */}
+          <div style={{ position: 'absolute', inset: 0, background: `rgba(180,70,10,${overlayOpacity})`, zIndex: 0 }} />
+          {/* 헤더 콘텐츠 */}
+          <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, width: '100%' }}>
+            <div style={{
+              width: logoSize, height: logoSize, borderRadius: '50%',
+              border: '2px solid #fff', overflow: 'hidden',
+              background: 'rgba(255,255,255,0.95)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+            }}>
+              {cfg.logo_url
+                ? <img src={cfg.logo_url} alt="logo" style={{ width: '88%', height: '88%', objectFit: 'contain', display: 'block' }} />
+                : <span style={{ fontWeight: 800, fontSize: 16, color }}>{(form.title || 'D')[0]}</span>
+              }
+            </div>
+            {form.title && (
+              <p style={{ margin: 0, fontSize: 11, fontWeight: 700, color: titleTextColor, textAlign: 'center', letterSpacing: '0.04em' }}>
+                {form.title}
+              </p>
+            )}
+            {form.subtitle && (
+              <p style={{ margin: 0, fontSize: 9, color: 'rgba(255,255,255,0.85)', textAlign: 'center' }}>
+                {form.subtitle}
+              </p>
+            )}
+            {langLines.length > 0 && (
+              <div style={{ textAlign: 'center' }}>
+                {langLines.map((l, i) => <p key={i} style={{ margin: 0, fontSize: 8, color: 'rgba(255,255,255,0.65)', lineHeight: 1.7 }}>{l}</p>)}
+              </div>
+            )}
           </div>
-        )}
-        <div style={{ background: '#fff', padding: '10px 8px 6px' }}>
-          {langLines.length > 0 && (
-            <div style={{ textAlign: 'center', marginBottom: 6 }}>
-              {langLines.map((l, i) => <p key={i} style={{ margin: 0, fontSize: 9, color: '#9ca3af' }}>{l}</p>)}
-            </div>
-          )}
-          {form.items.map((item, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '7px 8px', marginBottom: 5, borderRadius: 9, background: `${color}12` }}>
-              <IconBadge icon={item.icon || 'link'} color={color} size="sm" useThemeColor />
-              <span style={{ fontSize: 10, fontWeight: 500, color: '#374151', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label || '버튼'}</span>
-              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 5l7 7-7 7"/></svg>
-            </div>
-          ))}
-          {form.items.length === 0 && <p style={{ textAlign: 'center', fontSize: 10, color: '#d1d5db', padding: '6px 0' }}>링크 버튼이 표시됩니다</p>}
         </div>
-        <div style={{ height: 44, overflow: 'hidden', background: '#fff' }}>
-          <Rings color={color} />
+
+        {/* 버튼 영역 */}
+        <div style={{ position: 'relative' }}>
+          <div style={{ position: 'absolute', inset: 0, background: `rgba(180,70,10,${Math.max(0, overlayOpacity - 0.15)})`, pointerEvents: 'none' }} />
+          <div style={{ position: 'relative', zIndex: 1, padding: '8px 8px 10px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {form.items.map((item, i) => (
+              <div key={i} style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '8px 10px', borderRadius: 8,
+                background: 'rgba(255,248,240,0.82)',
+                border: '1px solid rgba(255,255,255,0.4)',
+                backdropFilter: 'blur(6px)',
+              }}>
+                <IconBadge icon={item.icon || 'link'} color={color} size="sm" useThemeColor />
+                <span style={{ fontSize: 10, fontWeight: 500, color: '#2d1a0e', flex: 1, textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.label || '버튼'}</span>
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+              </div>
+            ))}
+            {form.items.length === 0 && (
+              <p style={{ textAlign: 'center', fontSize: 10, color: 'rgba(255,255,255,0.6)', padding: '8px 0', margin: 0 }}>링크 버튼이 표시됩니다</p>
+            )}
+          </div>
         </div>
       </div>
     </div>
