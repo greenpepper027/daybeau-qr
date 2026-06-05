@@ -1,3 +1,10 @@
 @import "tailwindcss";
 @source "../components";
 @source "../app";
+
+/* [7] Linktree 구조 기반 리셋 */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
