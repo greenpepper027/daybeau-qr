@@ -42,15 +42,15 @@ export default function PublicPage({ page }) {
     const r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16);
     return `rgba(${r},${g},${b},${titleBgOpacity})`;
   })();
-  const titleTextColor = cfg.title_color || (titleBgOpacity < 0.3 ? color : '#ffffff');
+  const titleTextColor = cfg.title_color || '#ffffff';
 
-  const outerBg = cfg.bg_image_url
+  // ── 배경 스타일 (position: fixed 레이어에 적용) ──────────────────────────
+  const bgStyle = cfg.bg_image_url
     ? {
         backgroundImage: `url(${cfg.bg_image_url})`,
         backgroundSize: cfg.bg_size || 'cover',
         backgroundPosition: cfg.bg_pos || 'center',
         backgroundRepeat: 'no-repeat',
-        backgroundAttachment: 'fixed',
       }
     : cfg.bg_color
       ? { background: cfg.bg_color }
@@ -60,67 +60,87 @@ export default function PublicPage({ page }) {
         };
 
   const overlayOpacity = cfg.bg_image_url ? (cfg.bg_overlay ?? 0.3) : 0;
+  const cardOpacity = cfg.card_opacity ?? 0.88;
 
   return (
-    <div style={{ minHeight: '100vh', ...outerBg, position: 'relative' }}>
+    <>
+      {/* ── 배경 레이어: 고정, 스크롤 안 됨 ── */}
+      <div style={{
+        position: 'fixed', top: 0, left: 0,
+        width: '100%', height: '100%',
+        zIndex: 0,
+        ...bgStyle,
+      }} />
+
+      {/* ── 배경 어둡기 오버레이 ── */}
       {overlayOpacity > 0 && (
         <div style={{
-          position: 'fixed', inset: 0,
+          position: 'fixed', top: 0, left: 0,
+          width: '100%', height: '100%',
           background: `rgba(0,0,0,${overlayOpacity})`,
-          pointerEvents: 'none', zIndex: 0,
+          zIndex: 1, pointerEvents: 'none',
         }} />
       )}
 
+      {/* ── 콘텐츠 컨테이너: 스크롤되는 영역 ── */}
       <div style={{
-        position: 'relative', zIndex: 1,
-        maxWidth: 680, margin: '0 auto',
-        padding: '60px 24px 80px',
-        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        position: 'relative',
+        zIndex: 2,
+        maxWidth: 680,
+        margin: '0 auto',
+        minHeight: '100vh',
+        padding: '48px 16px 64px',
+        boxSizing: 'border-box',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
       }}>
 
-        {/* 아바타/로고 — 원형 컨테이너, 이미지는 contain */}
+        {/* 프로필 이미지 — 96px 원형 */}
         <div style={{
-          width: logoSize, height: logoSize, borderRadius: '50%',
+          width: logoSize, height: logoSize,
+          borderRadius: '50%',
+          overflow: 'hidden',
           background: 'rgba(255,255,255,0.95)',
-          boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          overflow: 'hidden', flexShrink: 0, marginBottom: 20,
+          margin: '0 auto 16px',
+          flexShrink: 0,
         }}>
           {cfg.logo_url
             ? <img src={cfg.logo_url} alt="logo" style={{
-                width: '88%', height: '88%', objectFit: 'contain',
+                width: '88%', height: '88%', objectFit: 'contain', display: 'block',
               }} />
-            : <span style={{ fontWeight: 800, fontSize: 28, color }}>D</span>
+            : <span style={{ fontWeight: 800, fontSize: 28, color }}>{(page.title || 'D')[0]}</span>
           }
         </div>
 
-        {/* 이름 (page.title) */}
+        {/* 페이지 제목 */}
         {page.title && (
-          <h1 style={{
-            margin: '0 0 8px', textAlign: 'center',
-            fontSize: 22, fontWeight: 700,
-            color: titleTextColor,
-            textShadow: titleBgOpacity < 0.5 ? 'none' : '0 1px 6px rgba(0,0,0,0.35)',
-            // 제목 바 배경이 설정된 경우 pill로 표시
-            ...(titleBgOpacity > 0.1
-              ? {
-                  background: titleBgColor,
-                  padding: '8px 28px',
-                  borderRadius: 999,
-                }
-              : {}),
+          <div style={{
+            background: titleBgColor,
+            borderRadius: 999,
+            padding: '8px 24px',
+            marginBottom: 8,
+            textAlign: 'center',
           }}>
-            {page.title}
-          </h1>
+            <h1 style={{
+              margin: 0, fontSize: 15, fontWeight: 700,
+              letterSpacing: '0.07em', textTransform: 'uppercase',
+              color: titleTextColor,
+            }}>
+              {page.title}
+            </h1>
+          </div>
         )}
 
         {/* 부제목 */}
         {page.subtitle && (
           <p style={{
-            margin: '0 0 6px', fontSize: 14,
-            color: 'rgba(255,255,255,0.88)',
-            textShadow: '0 1px 4px rgba(0,0,0,0.4)',
-            textAlign: 'center', fontWeight: 400,
+            margin: '0 0 4px', fontSize: 14,
+            color: 'rgba(255,255,255,0.85)',
+            textShadow: '0 1px 4px rgba(0,0,0,0.35)',
+            textAlign: 'center',
           }}>
             {page.subtitle}
           </p>
@@ -128,11 +148,11 @@ export default function PublicPage({ page }) {
 
         {/* 다국어 병기 */}
         {langLines.length > 0 && (
-          <div style={{ textAlign: 'center', marginTop: 6 }}>
+          <div style={{ textAlign: 'center', marginTop: 4, marginBottom: 4 }}>
             {langLines.map((l, i) => (
               <p key={i} style={{
                 margin: 0, fontSize: 11,
-                color: 'rgba(255,255,255,0.65)',
+                color: 'rgba(255,255,255,0.6)',
                 textShadow: '0 1px 3px rgba(0,0,0,0.3)',
                 lineHeight: 1.9,
               }}>{l}</p>
@@ -140,26 +160,29 @@ export default function PublicPage({ page }) {
           </div>
         )}
 
-        {/* 버튼 목록 — Linktree 스타일 pill 버튼 */}
-        <div style={{ width: '100%', marginTop: 32 }}>
+        {/* ── 링크 카드 목록 ── */}
+        <div style={{ width: '100%', marginTop: 28 }}>
           {page.items.map((item, i) => (
             <a key={i} href={item.url || '#'} target="_blank" rel="noopener noreferrer"
               onMouseEnter={() => setHoveredIdx(i)}
               onMouseLeave={() => setHoveredIdx(null)}
               style={{
-                display: 'flex', alignItems: 'center',
-                padding: '0 20px',
-                height: 56,
+                display: 'flex',
+                alignItems: 'center',
+                width: '100%',
+                boxSizing: 'border-box',
+                padding: '16px',
                 marginBottom: 16,
-                borderRadius: 999,
+                borderRadius: 12,
+                textAlign: 'center',
                 background: hoveredIdx === i
                   ? 'rgba(255,255,255,1)'
-                  : `rgba(255,255,255,${cfg.card_opacity ?? 0.88})`,
+                  : `rgba(255,255,255,${cardOpacity})`,
                 backdropFilter: 'blur(16px)',
                 WebkitBackdropFilter: 'blur(16px)',
                 boxShadow: hoveredIdx === i
-                  ? '0 6px 24px rgba(0,0,0,0.2)'
-                  : '0 2px 10px rgba(0,0,0,0.12)',
+                  ? '0 6px 24px rgba(0,0,0,0.18)'
+                  : '0 2px 8px rgba(0,0,0,0.10)',
                 transform: hoveredIdx === i ? 'scale(1.02)' : 'scale(1)',
                 transition: 'all 0.15s ease',
                 textDecoration: 'none',
@@ -167,17 +190,19 @@ export default function PublicPage({ page }) {
                 border: '1px solid rgba(255,255,255,0.5)',
                 position: 'relative',
               }}>
-              {/* 왼쪽 배지 자리 (레이아웃 균형용) */}
+              {/* 왼쪽 배지 */}
               <span style={{ width: 30, flexShrink: 0 }}>
                 <Badge icon={item.icon || 'link'} color={color} />
               </span>
-              {/* 가운데 정렬 텍스트 */}
+              {/* 중앙 텍스트 */}
               <span style={{
                 position: 'absolute', left: 0, right: 0,
                 textAlign: 'center',
                 fontSize: 15, fontWeight: 600, color: '#1a1a1a',
                 pointerEvents: 'none',
-              }}>{item.label}</span>
+              }}>
+                {item.label}
+              </span>
               {/* 오른쪽 화살표 */}
               <span style={{ marginLeft: 'auto', flexShrink: 0 }}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
@@ -197,6 +222,6 @@ export default function PublicPage({ page }) {
           )}
         </div>
       </div>
-    </div>
+    </>
   );
 }
