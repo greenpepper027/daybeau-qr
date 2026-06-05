@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { google } from 'googleapis';
 
 export async function GET() {
+  const spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID || '';
   try {
     const raw = process.env.GOOGLE_SERVICE_ACCOUNT_KEY || '';
     const key = JSON.parse(raw);
@@ -11,11 +12,11 @@ export async function GET() {
     });
     const sheets = google.sheets({ version: 'v4', auth });
     const res = await sheets.spreadsheets.values.get({
-      spreadsheetId: process.env.GOOGLE_SPREADSHEET_ID,
+      spreadsheetId,
       range: 'Pages!A2:I3',
     });
-    return NextResponse.json({ ok: true, rows: res.data.values });
+    return NextResponse.json({ ok: true, spreadsheetId, rows: res.data.values });
   } catch (e) {
-    return NextResponse.json({ ok: false, error: e.message, stack: e.stack?.slice(0, 500) });
+    return NextResponse.json({ ok: false, spreadsheetId, error: e.message });
   }
 }
