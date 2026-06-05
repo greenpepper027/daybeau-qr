@@ -109,24 +109,24 @@ export default function PublicPage({ page }) {
           <ShareIcon />
         </div>
 
-        {/* 【2】 중앙 카드 */}
+        {/* 【2】 중앙 카드 — 배경 이미지를 카드 전체에 */}
         <div style={{
           width: '100%',
           borderRadius: 20,
           overflow: 'hidden',
-          background: '#fff8f0',
+          ...headerBg,
           boxShadow: '0 8px 40px rgba(0,0,0,0.35)',
+          position: 'relative',
         }}>
 
-          {/* 【3】 카드 헤더 — 배경 이미지가 여기에 */}
+          {/* 【3】 카드 헤더 */}
           <div style={{
-            ...headerBg,
             position: 'relative',
             padding: '40px 24px 28px',
             display: 'flex', flexDirection: 'column',
             alignItems: 'center', gap: 10,
           }}>
-            {/* 어두운 오버레이 (텍스트 가독성) */}
+            {/* 헤더 오버레이 */}
             <div style={{
               position: 'absolute', inset: 0,
               background: `rgba(180,70,10,${overlayOpacity})`,
@@ -191,10 +191,18 @@ export default function PublicPage({ page }) {
           </div>
 
           {/* 【4】 링크 버튼 영역 */}
-          <div style={{
-            padding: 16,
-            display: 'flex', flexDirection: 'column', gap: 10,
-          }}>
+          <div style={{ position: 'relative' }}>
+            {/* 버튼 영역 오버레이 — 헤더보다 밝게 */}
+            <div style={{
+              position: 'absolute', inset: 0,
+              background: `rgba(180,70,10,${Math.max(0, overlayOpacity - 0.15)})`,
+              pointerEvents: 'none',
+            }} />
+            <div style={{
+              position: 'relative', zIndex: 1,
+              padding: 16,
+              display: 'flex', flexDirection: 'column', gap: 10,
+            }}>
             {page.items.map((item, i) => (
               <a key={i} href={item.url || '#'} target="_blank" rel="noopener noreferrer"
                 onMouseEnter={() => setHoveredIdx(i)}
@@ -205,8 +213,10 @@ export default function PublicPage({ page }) {
                   justifyContent: 'space-between',
                   padding: '14px 18px',
                   borderRadius: 10,
-                  background: hoveredIdx === i ? '#fff0dc' : '#fff8f0',
-                  border: '1px solid rgba(0,0,0,0.06)',
+                  background: hoveredIdx === i ? 'rgba(255,248,240,0.95)' : 'rgba(255,248,240,0.82)',
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
+                  border: '1px solid rgba(255,255,255,0.4)',
                   fontSize: 14, fontWeight: 500,
                   color: '#2d1a0e',
                   textDecoration: 'none',
@@ -229,10 +239,11 @@ export default function PublicPage({ page }) {
             ))}
 
             {page.items.length === 0 && (
-              <p style={{ textAlign: 'center', color: '#9ca3af', padding: '28px 0', margin: 0 }}>
+              <p style={{ textAlign: 'center', color: 'rgba(255,255,255,0.7)', padding: '28px 0', margin: 0 }}>
                 링크가 없습니다.
               </p>
             )}
+            </div>
           </div>
         </div>
       </div>
