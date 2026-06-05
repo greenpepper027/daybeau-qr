@@ -86,24 +86,27 @@ export default function PublicPage({ page }) {
       : { background: color };
 
   return (
-    /* 【1】 페이지 전체 배경 — 단색 그라디언트, 스크롤 컨테이너 */
+    /* 【1】 페이지 전체 배경 — 뷰포트 고정, 카드만 중앙 배치 */
     <div style={{
       background: 'linear-gradient(160deg, #d4845a 0%, #8b4513 100%)',
-      minHeight: '100vh',
-      overflowY: 'auto',
+      height: '100vh',
       display: 'flex',
       justifyContent: 'center',
-      alignItems: 'flex-start',
-      padding: '60px 16px 60px',
+      alignItems: 'center',
+      padding: '40px 16px',
       boxSizing: 'border-box',
+      overflow: 'hidden',
     }}>
 
       {/* 카드 wrapper — 절대 위치 버튼용 */}
-      <div style={{ position: 'relative', width: '100%', maxWidth: 480 }}>
+      <div style={{
+        position: 'relative', width: '100%', maxWidth: 480,
+        height: '100%', display: 'flex', flexDirection: 'column',
+      }}>
 
         {/* 카드 상단 바깥 버튼 */}
         <div style={{
-          position: 'absolute', top: -44, left: 0,
+          position: 'absolute', top: -36, left: 0,
           width: 36, height: 36, borderRadius: '50%',
           background: 'rgba(255,255,255,0.18)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -113,19 +116,24 @@ export default function PublicPage({ page }) {
             <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
           </svg>
         </div>
-        <div style={{ position: 'absolute', top: -44, right: 0 }}>
+        <div style={{ position: 'absolute', top: -36, right: 0 }}>
           <ShareIcon />
         </div>
 
-        {/* 【2】 중앙 카드 — 배경 이미지를 카드 전체에 */}
+        {/* 【2】 중앙 카드 — 뷰포트 높이에 맞게 늘어남, 내부만 스크롤 */}
         <div style={{
-          width: '100%',
+          flex: 1,
           borderRadius: 20,
           overflow: 'hidden',
           ...headerBg,
           boxShadow: '0 8px 40px rgba(0,0,0,0.35)',
           position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
         }}>
+
+          {/* 카드 내부 스크롤 영역 — 헤더+버튼 전체 스크롤 */}
+          <div style={{ flex: 1, overflowY: 'auto' }}>
 
           {/* 【3】 카드 헤더 */}
           <div style={{
@@ -253,6 +261,7 @@ export default function PublicPage({ page }) {
             )}
             </div>
           </div>
+          </div>{/* 스크롤 영역 끝 */}
         </div>
       </div>
     </div>
