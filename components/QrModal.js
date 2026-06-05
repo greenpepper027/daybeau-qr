@@ -6,7 +6,9 @@ export default function QrModal({ link, onClose }) {
   const canvasRef = useRef(null);
   const [copied, setCopied] = useState(false);
 
-  const shortUrl = `${window.location.origin}/r/${link.code}`;
+  const shortUrl = link.isPage
+    ? `${window.location.origin}/p/${link.code}`
+    : `${window.location.origin}/r/${link.code}`;
 
   useEffect(() => {
     if (canvasRef.current) {
