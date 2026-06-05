@@ -2,10 +2,9 @@
 @source "../components";
 @source "../app";
 
-/* Linktree 구조 기반 리셋 — body는 스크롤 안 함, 레이어2가 스크롤 */
+/* 기본 리셋 */
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  overflow: hidden;
 }
