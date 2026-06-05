@@ -27,28 +27,52 @@ function Badge({ icon, color }) {
   );
 }
 
-function ShareIcon() {
-  const [copied, setCopied] = useState(false);
+function ShareButton({ title, subtitle }) {
+  const [state, setState] = useState('idle'); // idle | copied | error
+
   const handleShare = async () => {
+    const url = window.location.href;
+    // 모바일 네이티브 공유 시트 우선
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: title || 'Daybeau', text: subtitle || '', url });
+        return;
+      } catch (e) {
+        if (e.name === 'AbortError') return; // 사용자가 취소
+      }
+    }
+    // fallback: 클립보드 복사
     try {
-      await navigator.clipboard.writeText(window.location.href);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
+      await navigator.clipboard.writeText(url);
+      setState('copied');
+      setTimeout(() => setState('idle'), 2000);
     } catch {
-      if (navigator.share) navigator.share({ url: window.location.href });
+      setState('error');
+      setTimeout(() => setState('idle'), 2000);
     }
   };
+
   return (
-    <button onClick={handleShare} title={copied ? '복사됨!' : '링크 복사'} style={{
+    <button onClick={handleShare} title="공유" style={{
       width: 36, height: 36, borderRadius: '50%',
       background: 'rgba(255,255,255,0.18)', border: 'none',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       cursor: 'pointer', color: '#fff', backdropFilter: 'blur(8px)',
+      WebkitBackdropFilter: 'blur(8px)',
+      position: 'relative',
     }}>
-      {copied
+      {state === 'copied'
         ? <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
         : <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
       }
+      {state === 'copied' && (
+        <span style={{
+          position: 'absolute', top: 42, right: 0,
+          background: 'rgba(0,0,0,0.7)', color: '#fff',
+          fontSize: 11, padding: '4px 8px', borderRadius: 6,
+          whiteSpace: 'nowrap',
+        }}>링크 복사됨!</span>
+      )}
     </button>
   );
 }
@@ -104,20 +128,9 @@ export default function PublicPage({ page }) {
         height: '100%', display: 'flex', flexDirection: 'column',
       }}>
 
-        {/* 카드 상단 바깥 버튼 */}
-        <div style={{
-          position: 'absolute', top: -36, left: 0,
-          width: 36, height: 36, borderRadius: '50%',
-          background: 'rgba(255,255,255,0.18)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: '#fff',
-        }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/>
-          </svg>
-        </div>
-        <div style={{ position: 'absolute', top: -36, right: 0 }}>
-          <ShareIcon />
+        {/* 공유 버튼 */}
+        <div style={{ position: 'absolute', top: -44, right: 0 }}>
+          <ShareButton title={page.title} subtitle={page.subtitle} />
         </div>
 
         {/* 【2】 중앙 카드 — 뷰포트 높이에 맞게 늘어남, 내부만 스크롤 */}
