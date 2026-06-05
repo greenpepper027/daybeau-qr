@@ -69,6 +69,7 @@ export default function PublicPage({ page }) {
   const headerBgPos   = cfg.bg_pos  || 'center top';
   // 오버레이: 에디터의 bg_overlay 값 활용, 없으면 0.55 기본값
   const overlayOpacity = cfg.bg_overlay ?? 0.55;
+  const cardOpacity = cfg.card_opacity ?? 0.82;
 
   // ── 헤더 색상 (이미지 없을 때 fallback) ──────────────────────────────────
   const headerBg = headerBgImage
@@ -213,7 +214,7 @@ export default function PublicPage({ page }) {
                   justifyContent: 'space-between',
                   padding: '14px 18px',
                   borderRadius: 10,
-                  background: hoveredIdx === i ? 'rgba(255,248,240,0.95)' : 'rgba(255,248,240,0.82)',
+                  background: hoveredIdx === i ? `rgba(255,248,240,${Math.min(1, cardOpacity + 0.1)})` : `rgba(255,248,240,${cardOpacity})`,
                   backdropFilter: 'blur(8px)',
                   WebkitBackdropFilter: 'blur(8px)',
                   border: '1px solid rgba(255,255,255,0.4)',

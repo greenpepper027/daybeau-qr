@@ -133,6 +133,7 @@ export function PagePreview({ form }) {
       : { background: `linear-gradient(135deg, ${color} 0%, ${color}bb 100%)` };
 
   const overlayOpacity = cfg.bg_overlay ?? 0.55;
+  const cardOpacity = cfg.card_opacity ?? 0.82;
 
   return (
     // 페이지 배경 (단색 그라디언트)
@@ -192,7 +193,7 @@ export function PagePreview({ form }) {
               <div key={i} style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 padding: '8px 10px', borderRadius: 8,
-                background: 'rgba(255,248,240,0.82)',
+                background: `rgba(255,248,240,${cardOpacity})`,
                 border: '1px solid rgba(255,255,255,0.4)',
                 backdropFilter: 'blur(6px)',
               }}>
@@ -422,7 +423,7 @@ export default function PageEditor({ initial, onSave, onCancel, saving }) {
                 </span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontSize: 11, color: '#6b7280', whiteSpace: 'nowrap', width: 52 }}>카드</span>
+                <span style={{ fontSize: 11, color: '#6b7280', whiteSpace: 'nowrap', width: 52 }}>버튼</span>
                 <input type="range" min="0.3" max="1" step="0.05"
                   value={form.config.card_opacity ?? 0.86}
                   onChange={e => cfg({ card_opacity: parseFloat(e.target.value) })}
