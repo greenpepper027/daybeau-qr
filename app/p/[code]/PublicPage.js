@@ -9,29 +9,20 @@ const FLAG_LABELS = {
 
 function Badge({ icon, color }) {
   if (!icon || icon === 'none') return null;
-  const flagLabel = FLAG_LABELS[icon];
-  if (flagLabel) {
-    return (
-      <span style={{
-        display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-        width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
-        background: color, color: '#fff',
-        fontSize: 9, fontWeight: 700, letterSpacing: '0.03em',
-      }}>
-        {flagLabel}
-      </span>
-    );
-  }
+  const label = FLAG_LABELS[icon];
   return (
     <span style={{
       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-      width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
+      width: 30, height: 30, borderRadius: '50%', flexShrink: 0,
       background: color, color: '#fff',
+      fontSize: label ? 9 : 0, fontWeight: 700, letterSpacing: '0.03em',
     }}>
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
-        <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
-      </svg>
+      {label ?? (
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/>
+          <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/>
+        </svg>
+      )}
     </span>
   );
 }
@@ -40,7 +31,7 @@ export default function PublicPage({ page }) {
   const color = page.theme_color || '#E76D26';
   const cfg = page.config || {};
   const lang = cfg.lang || {};
-  const logoH = { sm: 56, md: 80, lg: 110 }[cfg.logo_size || 'md'];
+  const logoSize = { sm: 72, md: 96, lg: 120 }[cfg.logo_size || 'md'];
   const langLines = [lang.en, lang.zh_hans, lang.zh_hant, lang.ja, lang.th].filter(Boolean);
   const [hoveredIdx, setHoveredIdx] = useState(null);
 
@@ -64,18 +55,14 @@ export default function PublicPage({ page }) {
     : cfg.bg_color
       ? { background: cfg.bg_color }
       : {
-          background: `
-            radial-gradient(ellipse at 20% 20%, ${color}55 0%, transparent 55%),
-            radial-gradient(ellipse at 80% 80%, ${color}44 0%, transparent 50%),
-            ${color}
-          `,
+          background: `radial-gradient(ellipse at 20% 20%, ${color}55 0%, transparent 55%),
+            radial-gradient(ellipse at 80% 80%, ${color}44 0%, transparent 50%), ${color}`,
         };
 
   const overlayOpacity = cfg.bg_image_url ? (cfg.bg_overlay ?? 0.3) : 0;
 
   return (
     <div style={{ minHeight: '100vh', ...outerBg, position: 'relative' }}>
-      {/* 배경 오버레이 */}
       {overlayOpacity > 0 && (
         <div style={{
           position: 'fixed', inset: 0,
@@ -84,59 +71,56 @@ export default function PublicPage({ page }) {
         }} />
       )}
 
-      {/* 메인 컨텐츠 */}
       <div style={{
         position: 'relative', zIndex: 1,
-        maxWidth: 520, margin: '0 auto',
-        padding: '56px 20px 80px',
+        maxWidth: 680, margin: '0 auto',
+        padding: '60px 24px 80px',
         display: 'flex', flexDirection: 'column', alignItems: 'center',
       }}>
 
-        {/* 로고 */}
-        <div style={{ marginBottom: 20, textAlign: 'center' }}>
+        {/* 아바타/로고 — 원형 컨테이너, 이미지는 contain */}
+        <div style={{
+          width: logoSize, height: logoSize, borderRadius: '50%',
+          background: 'rgba(255,255,255,0.95)',
+          boxShadow: '0 4px 24px rgba(0,0,0,0.18)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          overflow: 'hidden', flexShrink: 0, marginBottom: 20,
+        }}>
           {cfg.logo_url
             ? <img src={cfg.logo_url} alt="logo" style={{
-                height: logoH, objectFit: 'contain',
-                borderRadius: logoH > 70 ? '50%' : 0,
-                background: logoH > 70 ? 'rgba(255,255,255,0.9)' : 'none',
-                padding: logoH > 70 ? 8 : 0,
-                boxShadow: logoH > 70 ? '0 4px 20px rgba(0,0,0,0.15)' : 'none',
+                width: '88%', height: '88%', objectFit: 'contain',
               }} />
-            : <div style={{
-                width: 80, height: 80, borderRadius: '50%',
-                background: 'rgba(255,255,255,0.9)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontWeight: 800, fontSize: 18, color,
-                boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-              }}>D</div>
+            : <span style={{ fontWeight: 800, fontSize: 28, color }}>D</span>
           }
         </div>
 
-        {/* 제목 + 부제목 */}
+        {/* 이름 (page.title) */}
         {page.title && (
-          <div style={{
-            background: titleBgColor,
-            borderRadius: 12,
-            padding: '10px 28px',
-            marginBottom: 10,
-            textAlign: 'center',
+          <h1 style={{
+            margin: '0 0 8px', textAlign: 'center',
+            fontSize: 22, fontWeight: 700,
+            color: titleTextColor,
+            textShadow: titleBgOpacity < 0.5 ? 'none' : '0 1px 6px rgba(0,0,0,0.35)',
+            // 제목 바 배경이 설정된 경우 pill로 표시
+            ...(titleBgOpacity > 0.1
+              ? {
+                  background: titleBgColor,
+                  padding: '8px 28px',
+                  borderRadius: 999,
+                }
+              : {}),
           }}>
-            <h1 style={{
-              margin: 0, fontSize: 14, fontWeight: 700,
-              letterSpacing: '0.08em', textTransform: 'uppercase',
-              color: titleTextColor,
-            }}>
-              {page.title}
-            </h1>
-          </div>
+            {page.title}
+          </h1>
         )}
 
+        {/* 부제목 */}
         {page.subtitle && (
           <p style={{
-            margin: '0 0 8px', fontSize: 13,
-            color: 'rgba(255,255,255,0.9)',
+            margin: '0 0 6px', fontSize: 14,
+            color: 'rgba(255,255,255,0.88)',
             textShadow: '0 1px 4px rgba(0,0,0,0.4)',
-            textAlign: 'center', fontWeight: 500,
+            textAlign: 'center', fontWeight: 400,
           }}>
             {page.subtitle}
           </p>
@@ -144,11 +128,11 @@ export default function PublicPage({ page }) {
 
         {/* 다국어 병기 */}
         {langLines.length > 0 && (
-          <div style={{ textAlign: 'center', marginBottom: 24 }}>
+          <div style={{ textAlign: 'center', marginTop: 6 }}>
             {langLines.map((l, i) => (
               <p key={i} style={{
                 margin: 0, fontSize: 11,
-                color: 'rgba(255,255,255,0.7)',
+                color: 'rgba(255,255,255,0.65)',
                 textShadow: '0 1px 3px rgba(0,0,0,0.3)',
                 lineHeight: 1.9,
               }}>{l}</p>
@@ -156,42 +140,53 @@ export default function PublicPage({ page }) {
           </div>
         )}
 
-        {/* 버튼 목록 */}
-        <div style={{ width: '100%', marginTop: langLines.length > 0 ? 0 : 24 }}>
+        {/* 버튼 목록 — Linktree 스타일 pill 버튼 */}
+        <div style={{ width: '100%', marginTop: 32 }}>
           {page.items.map((item, i) => (
             <a key={i} href={item.url || '#'} target="_blank" rel="noopener noreferrer"
               onMouseEnter={() => setHoveredIdx(i)}
               onMouseLeave={() => setHoveredIdx(null)}
               style={{
-                display: 'flex', alignItems: 'center', gap: 14,
-                padding: '16px 20px',
-                marginBottom: 14,
-                borderRadius: 16,
+                display: 'flex', alignItems: 'center',
+                padding: '0 20px',
+                height: 56,
+                marginBottom: 16,
+                borderRadius: 999,
                 background: hoveredIdx === i
-                  ? 'rgba(255,255,255,0.97)'
-                  : `rgba(255,255,255,${cfg.card_opacity ?? 0.86})`,
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
+                  ? 'rgba(255,255,255,1)'
+                  : `rgba(255,255,255,${cfg.card_opacity ?? 0.88})`,
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
                 boxShadow: hoveredIdx === i
-                  ? '0 8px 28px rgba(0,0,0,0.18)'
-                  : '0 2px 12px rgba(0,0,0,0.12)',
-                transform: hoveredIdx === i ? 'translateY(-2px)' : 'translateY(0)',
-                transition: 'all 0.18s ease',
+                  ? '0 6px 24px rgba(0,0,0,0.2)'
+                  : '0 2px 10px rgba(0,0,0,0.12)',
+                transform: hoveredIdx === i ? 'scale(1.02)' : 'scale(1)',
+                transition: 'all 0.15s ease',
                 textDecoration: 'none',
                 cursor: 'pointer',
-                border: '1px solid rgba(255,255,255,0.6)',
+                border: '1px solid rgba(255,255,255,0.5)',
+                position: 'relative',
               }}>
-              <Badge icon={item.icon || 'link'} color={color} />
+              {/* 왼쪽 배지 자리 (레이아웃 균형용) */}
+              <span style={{ width: 30, flexShrink: 0 }}>
+                <Badge icon={item.icon || 'link'} color={color} />
+              </span>
+              {/* 가운데 정렬 텍스트 */}
               <span style={{
+                position: 'absolute', left: 0, right: 0,
+                textAlign: 'center',
                 fontSize: 15, fontWeight: 600, color: '#1a1a1a',
-                flex: 1, lineHeight: 1.3,
+                pointerEvents: 'none',
               }}>{item.label}</span>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                stroke={hoveredIdx === i ? color : `${color}90`}
-                strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
-                style={{ transition: 'stroke 0.18s ease', flexShrink: 0 }}>
-                <path d="M9 5l7 7-7 7"/>
-              </svg>
+              {/* 오른쪽 화살표 */}
+              <span style={{ marginLeft: 'auto', flexShrink: 0 }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                  stroke={hoveredIdx === i ? color : `${color}80`}
+                  strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                  style={{ transition: 'stroke 0.15s ease', display: 'block' }}>
+                  <path d="M9 5l7 7-7 7"/>
+                </svg>
+              </span>
             </a>
           ))}
 
