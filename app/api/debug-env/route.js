@@ -1,37 +1,21 @@
 import { NextResponse } from 'next/server';
+import { google } from 'googleapis';
 
 export async function GET() {
-  const raw = process.env.GOOGLE_SERVICE_ACCOUNT_KEY || '';
-  let parseError = null;
-  let parsed = false;
-  let fixedParseError = null;
-  let fixedParsed = false;
-
   try {
-    JSON.parse(raw);
-    parsed = true;
+    const raw = process.env.GOOGLE_SERVICE_ACCOUNT_KEY || '';
+    const key = JSON.parse(raw);
+    const auth = new google.auth.GoogleAuth({
+      credentials: key,
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+    const sheets = google.sheets({ version: 'v4', auth });
+    const res = await sheets.spreadsheets.values.get({
+      spreadsheetId: process.env.GOOGLE_SPREADSHEET_ID,
+      range: 'Pages!A2:I3',
+    });
+    return NextResponse.json({ ok: true, rows: res.data.values });
   } catch (e) {
-    parseError = e.message;
+    return NextResponse.json({ ok: false, error: e.message, stack: e.stack?.slice(0, 500) });
   }
-
-  let fixed = raw;
-  if (fixed.includes('\n')) {
-    fixed = fixed.replace(/\r\n/g, '\\n').replace(/\n/g, '\\n');
-  }
-  try {
-    JSON.parse(fixed);
-    fixedParsed = true;
-  } catch (e) {
-    fixedParseError = e.message;
-  }
-
-  return NextResponse.json({
-    raw_length: raw.length,
-    has_real_newlines: raw.includes('\n'),
-    first_100: raw.slice(0, 100),
-    parse_ok: parsed,
-    parse_error: parseError,
-    fixed_parse_ok: fixedParsed,
-    fixed_parse_error: fixedParseError,
-  });
 }
